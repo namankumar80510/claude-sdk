@@ -1,0 +1,21 @@
+{
+    "name": "dikki/claude-sdk",
+    "description": "A Simple PHP SDK For Using Anthropic Claude API",
+    "website": "https://github.com/namankumar80510/claude-sdk",
+    "license": "MIT",
+    "require": {
+        "guzzlehttp/guzzle": "^7.9"
+    },
+    "require-dev": {
+        "phpstan/phpstan": "^1.11"
+    },
+    "autoload": {
+        "psr-4": {
+            "Dikki\\Claude\\": "src/"
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "optimize-autoloader": true
+    }
+}
