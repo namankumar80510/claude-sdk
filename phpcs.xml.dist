@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ruleset name="ClaudeSDK">
+    <description>PHP CodeSniffer rules for ClaudeSDK</description>
+
+    <rule ref="PSR12"/>
+
+    <rule ref="Generic.WhiteSpace.DisallowTabIndent" severity="error"/>
+    <rule ref="Squiz.WhiteSpace.FunctionSpacing" severity="warning"/>
+
+    <file>src/</file>
+
+    <exclude-pattern>vendor/*</exclude-pattern>
+</ruleset>
