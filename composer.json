@@ -30,7 +30,8 @@
         "test": "phpunit",
         "analyse": "phpstan analyse",
         "cs": "phpcs",
-        "cs-fix": "phpcbf"
+        "cs-fix": "phpcbf",
+        "claude": "php bin/claude"
     },
     "config": {
         "optimize-autoloader": true,

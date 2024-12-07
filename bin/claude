@@ -1,0 +1,165 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+/**
+ * A simple CLI tool to interact with Claude API using the SDK;
+ * 
+ * you may use it to check if your API key is working, or use it directly as a CLI tool.
+ */
+
+require_once dirname(__DIR__) . '/vendor/autoload.php';
+
+use Dikki\Claude\ClaudeBuilder;
+use Dikki\Claude\Enum\ModelEnum;
+use Dikki\Claude\Message\MessageBuilder;
+
+class ClaudeCLI
+{
+    private const COMMANDS = [
+        'chat' => 'Start an interactive chat session with Claude',
+        'check' => 'Check if your API key is working',
+        'help' => 'Show this help message',
+        'models' => 'List available Claude models',
+        'version' => 'Show version information'
+    ];
+
+    private $claude;
+    private $apiKey;
+
+    public function __construct()
+    {
+        $this->loadApiKey();
+        $this->initializeClaude();
+    }
+
+    /**
+     * TODO: implement a better way to load the API key;
+     */
+    private function loadApiKey()
+    {
+        $envFile = dirname(__DIR__) . '/.env';
+        if (!file_exists($envFile)) {
+            $this->error("No .env file found. Please create one with your CLAUDE_API_KEY");
+            exit(1);
+        }
+        $env = parse_ini_file($envFile);
+        if (!isset($env['CLAUDE_API_KEY'])) {
+            $this->error("No CLAUDE_API_KEY found in .env file");
+            exit(1);
+        }
+        $this->apiKey = $env['CLAUDE_API_KEY'];
+    }
+
+    private function initializeClaude()
+    {
+        $this->claude = (new ClaudeBuilder())
+            ->withApiKey($this->apiKey)
+            ->withModel(ModelEnum::CLAUDE_2_1)
+            ->withTimeout(60)
+            ->build();
+    }
+
+    public function run($args)
+    {
+        $command = $args[1] ?? 'help';
+
+        if (!array_key_exists($command, self::COMMANDS)) {
+            $this->error("Unknown command: $command");
+            $this->showHelp();
+            exit(1);
+        }
+
+        $this->$command();
+    }
+
+    private function chat()
+    {
+        $this->success("Starting chat session with Claude (type 'exit' to quit)");
+        $messages = new MessageBuilder();
+        $messages->assistant("You are a helpful AI assistant.");
+
+        while (true) {
+            echo "\n\033[1;32m You:\033[0m ";
+            $input = trim(fgets(STDIN));
+
+            if ($input === 'exit') {
+                break;
+            }
+
+            $messages->user($input);
+            echo "\n\033[1;34m Claude:\033[0m ";
+
+            foreach ($this->claude->stream($messages->build()) as $chunk) {
+                echo $chunk->getContent();
+                flush();
+            }
+            echo "\n";
+        }
+    }
+
+    private function check()
+    {
+        $this->info("Checking API connection...");
+        try {
+            $messages = (new MessageBuilder())
+                ->assistant("You are a helpful AI assistant.")
+                ->user("Hello")
+                ->build();
+
+            $response = $this->claude->send($messages);
+            $this->success("API connection successful!");
+        } catch (\Exception $e) {
+            $this->error("API connection failed: " . $e->getMessage());
+            exit(1);
+        }
+    }
+
+    private function models()
+    {
+        $this->info("Available Claude models:");
+        foreach ((new \ReflectionClass(ModelEnum::class))->getConstants() as $name => $value) {
+            echo "\033[1;36m • " . $value->value . "\033[0m\n";
+        }
+    }
+
+    private function version()
+    {
+        $composerJson = json_decode(file_get_contents(dirname(__DIR__) . '/composer.json'), true);
+        $this->info("Claude CLI Tool v" . ($composerJson['version'] ?? '1.0.0'));
+    }
+
+    private function help()
+    {
+        $this->showHelp();
+    }
+
+    private function showHelp()
+    {
+        echo "\n\033[1;33mClaude CLI Tool - Available Commands:\033[0m\n\n";
+        foreach (self::COMMANDS as $command => $description) {
+            echo sprintf("\033[1;32m  %-10s\033[0m %s\n", $command, $description);
+        }
+        echo "\n";
+    }
+
+    private function success($message)
+    {
+        echo "\033[1;32m✓ " . $message . "\033[0m\n";
+    }
+
+    private function error($message)
+    {
+        echo "\033[1;31m✗ " . $message . "\033[0m\n";
+    }
+
+    private function info($message)
+    {
+        echo "\033[1;34mℹ " . $message . "\033[0m\n";
+    }
+}
+
+// Run the CLI
+$cli = new ClaudeCLI();
+$cli->run($argv);
