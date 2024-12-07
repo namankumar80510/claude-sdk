@@ -18,7 +18,7 @@ use Dikki\Claude\Message\MessageBuilder;
 class ClaudeCLI
 {
     private const COMMANDS = [
-        'chat' => 'Start an interactive chat session with Claude',
+        'prompt' => 'Send a single prompt to Claude',
         'check' => 'Check if your API key is working',
         'help' => 'Show this help message',
         'models' => 'List available Claude models',
@@ -71,32 +71,31 @@ class ClaudeCLI
             exit(1);
         }
 
-        $this->$command();
+        if ($command === 'prompt') {
+            if (!isset($args[2])) {
+                $this->error("Please provide a prompt");
+                exit(1);
+            }
+            $this->prompt(array_slice($args, 2));
+        } else {
+            $this->$command();
+        }
     }
 
-    private function chat()
+    private function prompt($args)
     {
-        $this->success("Starting chat session with Claude (type 'exit' to quit)");
-        $messages = new MessageBuilder();
-        $messages->assistant("You are a helpful AI assistant.");
+        $prompt = implode(' ', $args);
+        $messages = (new MessageBuilder())
+            ->assistant("You are a helpful AI assistant.")
+            ->user($prompt)
+            ->build();
 
-        while (true) {
-            echo "\n\033[1;32m You:\033[0m ";
-            $input = trim(fgets(STDIN));
-
-            if ($input === 'exit') {
-                break;
-            }
-
-            $messages->user($input);
-            echo "\n\033[1;34m Claude:\033[0m ";
-
-            foreach ($this->claude->stream($messages->build()) as $chunk) {
-                echo $chunk->getContent();
-                flush();
-            }
-            echo "\n";
+        echo "\n\033[1;34m Claude:\033[0m ";
+        foreach ($this->claude->stream($messages) as $chunk) {
+            echo $chunk->getContent();
+            flush();
         }
+        echo "\n\n";
     }
 
     private function check()
