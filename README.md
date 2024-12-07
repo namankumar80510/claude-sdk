@@ -1,5 +1,9 @@
 # Claude API PHP SDK
 
+![PHP Version](https://img.shields.io/badge/PHP-8.2%2B-blue)
+
+![Example Screenshot](https://claude.yojanamagazine.online/images/example.jpg)
+
 This is a useful PHP library that you can use to communicate with Anthropic's Claude via API.
 
 The new version of the library is a complete rewrite and hence is not backward compatible with the previous version. Previous methods of getResponse and getTextResponse have been removed.
