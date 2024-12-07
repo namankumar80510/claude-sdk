@@ -7,14 +7,14 @@ use Dikki\Claude\Enum\ModelEnum;
 use Dikki\Claude\Message\MessageBuilder;
 
 $claude = (new ClaudeBuilder())
-    ->withApiKey($_ENV['CLAUDE_API_KEY'])
-    ->withModel(ModelEnum::CLAUDE_3_SONNET)
+    ->withApiKey(parse_ini_file(dirname(__DIR__) . '/.env')['CLAUDE_API_KEY'])
+    ->withModel(ModelEnum::CLAUDE_2_1)
     ->withTimeout(60)
     ->withDebug(true)
     ->build();
 
 $messages = (new MessageBuilder())
-    ->system("You are a helpful AI assistant.")
+    ->assistant("You are a helpful AI assistant.")
     ->user("What is the meaning of life?")
     ->build();
 

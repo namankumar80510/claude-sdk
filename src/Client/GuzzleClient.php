@@ -20,6 +20,10 @@ class GuzzleClient implements ClientInterface
     private Client $client;
     private ResponseHandler $responseHandler;
 
+    /**
+     * For some reason, the base url is not working when using the /v1/ endpoint;
+     * so had to manually add it to each request.
+     */
     public function __construct(
         private readonly ClientConfig $config
     ) {
@@ -36,9 +40,12 @@ class GuzzleClient implements ClientInterface
     public function sendRequest(MessageCollection $messages, array $options = []): ResponseInterface
     {
         try {
-            $response = $this->client->post('/messages', [
+            $response = $this->client->post('/v1/messages', [
                 'headers' => $this->getHeaders(),
-                'json' => $this->prepareRequestBody($messages, $options),
+                'json' => array_merge(
+                    ['model' => $this->config->getModelConfig()->getModel()],
+                    $this->prepareRequestBody($messages, $options)
+                ),
             ]);
             
             return $this->responseHandler->handle($response);
@@ -52,9 +59,12 @@ class GuzzleClient implements ClientInterface
         $options['stream'] = true;
         
         try {
-            $response = $this->client->post('/messages', [
+            $response = $this->client->post('/v1/messages', [
                 'headers' => $this->getHeaders(),
-                'json' => $this->prepareRequestBody($messages, $options),
+                'json' => array_merge(
+                    ['model' => $this->config->getModelConfig()->getModel()],
+                    $this->prepareRequestBody($messages, $options)
+                ),
                 'stream' => true,
             ]);
             
@@ -66,9 +76,12 @@ class GuzzleClient implements ClientInterface
 
     public function sendAsyncRequest(MessageCollection $messages, array $options = []): PromiseInterface
     {
-        return $this->client->postAsync('/messages', [
+        return $this->client->postAsync('/v1/messages', [
             'headers' => $this->getHeaders(),
-            'json' => $this->prepareRequestBody($messages, $options),
+            'json' => array_merge(
+                ['model' => $this->config->getModelConfig()->getModel()],
+                $this->prepareRequestBody($messages, $options)
+            ),
         ])->then(
             fn (PsrResponseInterface $response) => $this->responseHandler->handle($response),
             fn (\Throwable $e) => throw new ApiException('Async request failed: ' . $e->getMessage(), 0, $e)
@@ -84,17 +97,16 @@ class GuzzleClient implements ClientInterface
         ], $this->config->getDefaultHeaders());
     }
 
-    private function prepareRequestBody(MessageCollection $messages, array $options): array
+    private function prepareRequestBody(MessageCollection $messages, array $options = []): array
     {
         return array_filter([
             'messages' => $messages->toArray(),
-            'model' => $options['model'] ?? null,
-            'max_tokens' => $options['max_tokens'] ?? null,
-            'temperature' => $options['temperature'] ?? null,
-            'top_p' => $options['top_p'] ?? null,
-            'top_k' => $options['top_k'] ?? null,
-            'metadata' => $options['metadata'] ?? null,
-            'stream' => $options['stream'] ?? null,
-        ], fn ($value) => $value !== null);
+            'max_tokens' => $options['max_tokens'] ?? $this->config->getModelConfig()->getMaxTokens(),
+            'temperature' => $options['temperature'] ?? $this->config->getModelConfig()->getTemperature(),
+            'top_p' => $options['top_p'] ?? $this->config->getModelConfig()->getTopP(),
+            'top_k' => $options['top_k'] ?? $this->config->getModelConfig()->getTopK(),
+            'stop_sequences' => $options['stop_sequences'] ?? $this->config->getModelConfig()->getStopSequences(),
+            'stream' => $options['stream'] ?? false,
+        ]);
     }
 } 

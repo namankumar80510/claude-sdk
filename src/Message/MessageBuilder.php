@@ -15,6 +15,10 @@ class MessageBuilder
         $this->collection = new MessageCollection();
     }
 
+    /**
+     * There is no system role in Claude, so this method is wrong;
+     * need to add a method to set system prompt instead.
+     */
     public function system(string $content): self
     {
         $this->collection->add(Message::create(RoleEnum::SYSTEM, $content));
@@ -37,4 +41,4 @@ class MessageBuilder
     {
         return $this->collection;
     }
-} 
+}

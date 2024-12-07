@@ -59,19 +59,20 @@ class ClaudeBuilder
             throw new ConfigurationException('API key is required');
         }
 
+        $modelConfig = new ModelConfig(
+            model: $this->model ?? ModelEnum::getDefault()->value
+        );
+
         $clientConfig = new ClientConfig(
             apiKey: $this->apiKey,
             baseUrl: $this->baseUrl ?? 'https://api.anthropic.com/v1',
-            apiVersion: $this->apiVersion ?? '2024-02-29',
+            apiVersion: $this->apiVersion ?? '2023-06-01',
             timeout: $this->timeout ?? 30,
             connectTimeout: $this->connectTimeout ?? 10,
             debug: $this->debug,
             proxyUrl: $this->proxyUrl,
-            defaultHeaders: $this->defaultHeaders
-        );
-
-        $modelConfig = new ModelConfig(
-            model: $this->model ?? ModelEnum::getDefault()->value
+            defaultHeaders: $this->defaultHeaders,
+            modelConfig: $modelConfig
         );
 
         return new Claude(

@@ -13,7 +13,7 @@ enum ModelEnum: string
     
     public static function getDefault(): self
     {
-        return self::CLAUDE_3_SONNET;
+        return self::CLAUDE_2_1;
     }
     
     public static function isValid(string $model): bool
