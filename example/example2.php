@@ -7,8 +7,8 @@ use Dikki\Claude\Enum\ModelEnum;
 use Dikki\Claude\Message\MessageBuilder;
 
 $claude = (new ClaudeBuilder())
-    ->withApiKey(parse_ini_file(dirname(__DIR__) . '/.env')['CLAUDE_API_KEY'])
-    ->withModel(ModelEnum::CLAUDE_2_1)
+    ->withApiKey(parse_ini_file(dirname(__DIR__) . '/.env')['CLAUDE_API_KEY']) // use a DotEnv library instead of parse_ini_file
+    // ->withModel(ModelEnum::CLAUDE_2_1) // comment this line or remove to use the default model
     ->withTimeout(60)
     ->withDebug(true)
     ->build();
