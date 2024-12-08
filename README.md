@@ -8,6 +8,8 @@ This is a useful PHP library that you can use to communicate with Anthropic's Cl
 
 The new version of the library is a complete rewrite and hence is not backward compatible with the previous version. Previous methods of getResponse and getTextResponse have been removed.
 
+You can checkout the [documentation on the website](https://claude.yojanamagazine.online/).
+
 ## Features
 
 - Support for all Claude models (Claude 3 Opus/Sonnet/Haiku, Claude 2.1)
