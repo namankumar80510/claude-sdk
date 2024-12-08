@@ -1,6 +1,7 @@
-vendor/
-node_modules/
 .idea/
 .vscode/
+tmp/
+vendor/
+node_modules/
 .env
 composer.lock
