@@ -33,6 +33,7 @@ class GuzzleClient implements ClientInterface
             'connect_timeout' => $config->getConnectTimeout(),
             'proxy' => $config->getProxyUrl(),
             'debug' => $config->isDebug(),
+            'verify' => $config->getSSLVerify(),
         ]);
         $this->responseHandler = new ResponseHandler();
     }
