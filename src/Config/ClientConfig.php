@@ -17,6 +17,7 @@ class ClientConfig
         private readonly bool $debug = false,
         private readonly ?string $proxyUrl = null,
         private readonly array $defaultHeaders = [],
+        private readonly bool $sslVerify = true,
         ?ModelConfig $modelConfig = null
     ) {
         $this->modelConfig = $modelConfig ?? new ModelConfig();
@@ -55,6 +56,11 @@ class ClientConfig
     public function getProxyUrl(): ?string
     {
         return $this->proxyUrl;
+    }
+
+    public function getSSLVerify(): bool
+    {
+        return $this->sslVerify;
     }
 
     public function getDefaultHeaders(): array

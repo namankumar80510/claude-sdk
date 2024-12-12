@@ -22,6 +22,7 @@ class ClaudeBuilder
     private bool $debug = false;
     private ?string $proxyUrl = null;
     private array $defaultHeaders = [];
+    private bool $sslVerify = true;
 
     public function withApiKey(string $apiKey): self
     {
@@ -53,6 +54,12 @@ class ClaudeBuilder
         return $this;
     }
 
+    public function withSSLVerify(bool $sslVerify = true): self
+    {
+        $this->sslVerify = $sslVerify;
+        return $this;
+    }
+
     public function build(): Claude
     {
         if (empty($this->apiKey)) {
@@ -72,6 +79,7 @@ class ClaudeBuilder
             debug: $this->debug,
             proxyUrl: $this->proxyUrl,
             defaultHeaders: $this->defaultHeaders,
+            sslVerify: $this->sslVerify,
             modelConfig: $modelConfig
         );
 
