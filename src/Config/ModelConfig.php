@@ -19,9 +19,9 @@ class ModelConfig
     public function __construct(
         ?string $model = null,
         float $temperature = 0.7,
-        float $topP = null,
-        int $topK = null,
-        array $stopSequences = null,
+        ?float $topP = null,
+        ?int $topK = null,
+        ?array $stopSequences = null,
         int $maxTokens = 4096
     ) {
         $this->setModel($model ?? ModelEnum::getDefault()->value);
@@ -89,4 +89,4 @@ class ModelConfig
             'max_tokens' => $this->maxTokens,
         ], fn($value) => $value !== null);
     }
-} 
+}
