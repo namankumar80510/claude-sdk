@@ -9,7 +9,7 @@ use Dikki\Claude\Exception\ConfigurationException;
 
 class ModelConfig
 {
-    private string $model;
+    private ?string $model;
     private float $temperature;
     private ?float $topP;
     private ?int $topK;
@@ -17,7 +17,7 @@ class ModelConfig
     private ?int $maxTokens;
 
     public function __construct(
-        string $model = null,
+        ?string $model = null,
         float $temperature = 0.7,
         float $topP = null,
         int $topK = null,
